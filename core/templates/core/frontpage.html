@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <title>PipiQ</title>
+</head>
+<body class="bg-gray-100">
+    {% if user.is_authenticated %}
+    <div class="hello">
+            <p class="font-bold">Добро пожаловать, <strong>{{user}}</strong>!</p>                
+            <h1 class="font-semibold">Начни общаться перейдя в <a class="font-bold text-gray-800" href="{% url 'room' room.title %}">"Общий чат"</a>.</h1>
+    </div>
+    {% else %}
+    <div class="hello">
+        <p class="font-bold">Войдите в аккаунт.</p>  
+    </div>
+{% endif %}
+<header class="bg-gray-800">
+    <a href="/" class="text-white text-2xl font-semibold">PipiQ</a>
+    <div class="alert hide">
+        <span class="fas fa-exclamation-circle"></span>
+        <span class="msg">Warning: This is a warning alert!</span>
+        <span class="close-btn">
+            <span class="fas fa-times"></span>
+        </span>
+    </div>
+    <nav class="navigation">
+            {% if user.is_authenticated %}
+            <a href="{% url 'room' room.title %}">Общий чат</a>
+                {% if user.is_superuser %}
+                <a href="/admin/">Панель управления</a>
+                {% endif %}
+                <a href="/signout/">Выйти из аккаунта</a>
+            {% else %}
+                <button class="btnLogin-popup">Войти</button>
+            {% endif %}
+    </nav>
+</header>
+<!-- <form id="profileImageForm" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="file" name="profile_image">
+    <button id="uploadButton" type="button">Upload Profile Image</button>
+    <img id="profileImage" src="{{ user.profile_image.url }}" alt="user" class="block">
+</form> -->
+    <div class="wrapper">
+        <span class="icon-close">
+            <ion-icon name="close"></ion-icon>
+        </span>
+        <div class="form-box login">
+            <h2>Войти в аккаунт</h2>
+                <form method="post" id="form-login">
+                    {% csrf_token %}
+                    <div class="input-box">
+                        <span class="icon">
+                            <ion-icon name="person"></ion-icon>
+                        </span>
+                        <input type="text" id="username" name="username" required>
+                        <label>Имя пользователя</label>
+                    </div>
+                    <div class="input-box">
+                        <span class="icon">
+                            <ion-icon name="lock-closed"></ion-icon>
+                        </span>
+                        <input type="password" id="password1" name="password1" required>
+                        <label>Пароль</label>
+                    </div>
+                    <button type="submit" class="btn">Войти</button>
+                    <div class="login-register">
+                        <p>Нет аккаунта? <a class="register-link">Зарегистрируйтесь</a></p>
+                        <p>Забыли пароль? <a href="{% url 'reset_password' %}" class="reset-link">Сбросить пароль</a></p>
+                    </div>               
+                </form>
+        </div> 
+        <div class="form-box register">
+            <h2>Создать аккаунт</h2>
+            <form method="post" id="post-form">
+                {% csrf_token %}
+                <div class="input-box">
+                    <span class="icon">
+                        <ion-icon name="person"></ion-icon>
+                    </span>
+                    <input type="text" id="username" name="username" Required>
+                    <label>Имя пользователя</label>
+                </div>                        
+                <div class="input-box">
+                    <span class="icon">
+                        <ion-icon name="mail"></ion-icon>
+                    </span>
+                    <input type="email" id="email" name="email" Required>
+                    <label for="email">Email адрес</label>
+                </div>
+                    
+                <div class="input-box">
+                    <span class="icon">
+                        <ion-icon name="lock-closed"></ion-icon>                        
+                    </span>
+                    <input type="password" id="password1" name="password1" Required>
+                    <label for="pass1">Пароль</label>
+                </div>
+                <div class="input-box">
+                    <span class="icon">
+                        <ion-icon name="lock-closed"></ion-icon>                        
+                    </span>
+                    <input type="password" id="password2" name="password2" Required>
+                    <label for="pass2">Подтвердите пароль</label>
+                </div>
+                <button type="submit" class="btn">Регистрация</button>
+                <div class="login-register">
+                    <p>Есть аккаунт? <a class="login-link">Войдите</a></p>
+                </div> 
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="/static/js/script.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://kit.fontawesome.com/43b34a0a27.js" crossorigin="anonymous"></script> 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // для регистрации и сброса ее значения
+        var registerForm = document.getElementById('post-form');
+        if (registerForm !== null) {
+            registerForm.reset();
+        } else {
+            console.error('Form with ID "post-form" for registration not found');
+        }
+
+        // для регистрации и сброса ее значения
+        var loginForm = document.getElementById('form-login');
+        if (loginForm !== null) {
+            loginForm.reset();
+        } else {
+            console.error('Form with ID "form-login" for login not found');
+        }
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function() {
+        $('#post-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this);
+            $('.err-msg').remove();
+            var alertDiv = $('<div>');
+            alertDiv.addClass("alert alert-danger err-msg");
+            alertDiv.hide();
+
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{ csrf_token }}' 
+                },
+                url: "{% url 'signup' %}", 
+                data: $(this).serialize(), // Сериализация данных формы
+                type: 'POST',
+                dataType: 'json',
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                    alert("An error occurred"); // Обработка ошибок AJAX
+                },
+                success: function(resp) {
+                    if (resp.status === 'success') {
+                        // Очищаем поля формы регистрации
+                        $('#post-form')[0].reset();
+                        wrapper.classList.remove('active');
+                        $('.alert').removeClass('hide').addClass('alert-success').find('.msg').text(resp.message);
+                        alertDiv.addClass("alert-success");
+                        $('.msg').text("Проверьте почту для подтверждения аккаунта");
+                        $('.alert').removeClass("hide");
+                        $('.alert').addClass("show");
+                        $('.alert').addClass("showAlert");
+                        setTimeout(function(){
+                            $('.alert').addClass("hide");
+                            $('.alert').removeClass("show");
+                        },5000); //hide alert automatic 5 sec
+                        $(document).on('click', '.close-btn', function() {
+                        $('.alert').addClass("hide");
+                        $('.alert').removeClass("show");
+                        });
+                    } else if (resp.status === 'failed' && resp.msg) {
+                        alertDiv.removeClass("hide");
+                        alertDiv.addClass("alert-danger");
+                        $('.msg').text(resp.msg);
+                    } else {
+                        alertDiv.removeClass("hide");
+                        alertDiv.addClass("alert-danger");
+                        $('.msg').text("Пользователь с таким именем уже существует");
+                        $('.alert').removeClass("hide");
+                        $('.alert').addClass("show");
+                        $('.alert').addClass("showAlert");
+                        setTimeout(function(){
+                            $('.alert').addClass("hide");
+                            $('.alert').removeClass("show");
+                        },5000); //hide alert automatic 5 sec
+                        $(document).on('click', '.close-btn', function() {
+                        $('.alert').addClass("hide");
+                        $('.alert').removeClass("show");
+                        });
+                        console.error(resp);
+                    }
+                }
+            });
+        });
+    });
+</script>
+<script>
+    $(function() {
+        var alertDiv = $('<div>');
+        alertDiv.addClass("alert alert-danger err-msg");
+        alertDiv.hide();
+
+        $('#form-login').submit(function(e){
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+
+            $.ajax ({
+                headers: {
+                    "X-CSRFToken": '{{ csrf_token }}'
+                },
+                url: "{% url 'signin' %}",
+                data: $(this).serialize(),
+                type: 'POST',
+                dataType: 'json',
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                    alertDiv.text("An error occurred").removeClass("hide").addClass("alert-danger");
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success'){
+                        
+                        if (resp.redirect_url) {
+                            // перенаправление на указанный URL.
+                            window.location.href = resp.redirect_url;
+                        }
+                        
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        alertDiv.text(resp.msg).removeClass("hide").addClass("alert-danger");
+                    } else {
+                        alertDiv.removeClass("hide");
+                        alertDiv.addClass("alert-danger");
+                        $('.msg').text("Неверное имя пользователя или пароль");
+                        $('.alert').removeClass("hide");
+                        $('.alert').addClass("show");
+                        $('.alert').addClass("showAlert");
+                        setTimeout(function(){
+                            $('.alert').addClass("hide");
+                            $('.alert').removeClass("show");
+                        },5000); //hide alert automatic 5 sec
+                        $(document).on('click', '.close-btn', function() {
+                        $('.alert').addClass("hide");
+                        $('.alert').removeClass("show");
+                        });
+                        console.error(resp);
+                    }
+                }
+            })
+        });
+    });
+</script>
+<!-- <script>
+    document.getElementById('uploadButton').addEventListener('click', function() {
+        // Создание объекта FormData и добавление изображения
+        var formData = new FormData();
+        var fileField = document.querySelector('input[type="file"]');
+        formData.append('profile_image', fileField.files[0]);
+    
+        // Создание AJAX-запроса
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "upload_profile_image" %}', true);
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+    
+        // Отправка данных формы
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // Обновление изображения профиля после успешной загрузки
+                // (здесь предполагается, что сервер возвращает URL нового изображения)
+                var response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    // Перезагрузка изображения профиля на странице
+                    var profileImage = document.getElementById('profileImage');
+                    profileImage.src = response.profile_image_url;
+                } else {
+                    console.error('Ошибка при загрузке изображения профиля');
+                }
+            }
+        };
+    
+        // Отправка запроса на сервер
+        xhr.send(formData);
+    });
+    </script> -->
+
+
+
+
+
+

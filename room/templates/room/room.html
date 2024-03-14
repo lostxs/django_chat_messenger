@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ room.title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://flowbite.com/docs/flowbite.css?v=2.3.0a">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplebar/5.3.6/simplebar.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <style>
+        html, body {
+            height: 100%; 
+            margin: 0; 
+            font-family: sans-serif;
+        }    
+        .sidebar {
+            width: 20%; 
+            min-width: 200px; 
+        }
+        .main-body {
+            height: calc(100% - 2rem); 
+ 
+        }
+        .chat-area {
+            height: calc(100% - 6rem); 
+
+        }
+        .write {
+            width: calc(100% - 4rem); 
+        }
+
+        
+    </style>
+</head>
+<body class="bg-gray-200  antialiased ">
+    <div class="w-full h-screen">
+        <div class="flex h-full">
+            <div class="sm:w-32 w-full sm:w-64 bg-gray-200 sidebar">
+                <div class="user-profile text-center">
+                    <div class="w-16 h-16 rounded-full overflow-hidden m-auto mt-16 border-2 border-white bg-white shadow-lg relative">
+                        <img src="{{ user.profile_image.url }}" alt="user" id="profileImage" class="block object-cover w-full h-full">
+                    </div>
+                    <div class="block py-4 px-12 border-l-4 text-black hover:text-gray-800">
+                        <b>{{ user.username }}</b>
+
+                            <label for="profileImageInput" class="inline-block align-text-bottom cursor-pointer">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                  </svg>    
+                                <input type="file" id="profileImageInput" name="profile_image" style="display: none;">
+                            </label>
+                    </div>
+                </div>
+                <div class="menu mt-8">
+                    <a class="block py-4 px-12 border-l-4 text-gray-600 hover:bg-gray-300 hover:text-black" href="/">
+                        <span class="inline-block align-text-bottom mr-2">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </span>
+                        На главную
+                    </a>
+                    <a class="block py-4 px-12 border-l-4 border-gray-800 bg-gray-300 text-black hover:bg-gray-300 hover:text-black" href="{% url 'room' room.title %}">
+                        <span class="inline-block align-text-bottom mr-2">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        </span>
+                        Чат
+                    </a>
+                    {% if user.is_superuser %}
+                    <a href="/admin/" class="block py-4 px-12 border-l-4 text-gray-600 hover:bg-gray-300 hover:text-black" href="javascript:return false;">
+                        <span class="inline-block align-text-bottom mr-2">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </span>
+                        Панель управления
+                    </a>
+                    {% endif %}
+                    <div class="block py-4 px-12 border-l-4 text-gray-600 hover:bg-gray-300 hover:text-black">
+                        <span class="inline-block text-gray-700">
+                            <b>Online Users</b>
+                            
+                            <span id="toggle-users-list" class="inline-block align-text-bottom cursor-pointer">
+                                <svg id="toggle-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4">
+                                    <path d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </span>
+                            <ul id="users-list" style="display: none; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;"></ul>
+                        </span>
+                        <span class="inline-block ml-8 text-gray-700 hover:text-gray-900 align-bottom"></span>
+                    </div>
+                    <a class="block py-4 px-12 border-l-4 text-gray-600 hover:bg-gray-300 hover:text-black" href="/signout/">
+                        <span class="inline-block align-text-bottom mr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"  class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                              </svg>
+                              
+                        </span>
+                        Выйти
+                    </a>
+                </div>
+            </div>
+            <div class="flex-1 bg-gray-100 w-full h-full">
+                <div class="main-body  m-auto ml-2">
+                    <div class="py-4 flex-2 flex flex-row"></div>
+                    <div class="main flex-1 flex flex-col">
+                        <div class="flex-1 flex h-full">
+                            <div class="chat-area flex-1 flex flex-col mx-auto">
+
+                                <span id="sidebarToggleIcon" class="w-6 h-6 cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+                                    </svg>
+                                  </span>
+
+                                  
+
+                                <div class="flex-3">
+                                    <h2 class="text-3xl py-1 mb-8 border-b-2 border-gray-200"> <b>{{ room.title }}</b></h2>
+                                </div>
+                                <div class="chat-messages overflow-auto" id="chat-messages" style="max-height: 75vh; width: 100%; word-break: break-all;">
+                                    {% for message in messages %}
+                                    <div class="message mb-4 flex {% if message.user == request.user %} text-right {% else %} justify-start {% endif %}">
+                                        {% if message.user != request.user %}
+                                        <div class="flex-2">
+                                            <div class="w-12 h-12 relative">
+                                                <img class="w-12 h-12 rounded-full mx-auto" src="{{ message.user.profile_image.url }}" alt="{{ message.user.username }}">
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        <div class="flex-1 px-2">
+                                            <p class="text-sm font-semibold {% if message.user == request.user %} text-black {% else %} text-gray-900 dark:text-black {% endif %}">
+                                                {{ message.user.username }}
+                                            </p>
+                                            <div class="inline-block {% if message.user == request.user %} bg-blue-500 text-white {% else %} bg-gray-300 text-gray-700 {% endif %} rounded-full p-2 px-6">
+                                                    {{ message.content }}
+                                            </div>
+                                            <div class="pl-4"><small class="text-gray-500">{{ message.timestamp|date:"H:i" }}</small></div>
+                                        </div>
+                                        {% if message.user == request.user %}
+                                        <div class="flex-2">
+                                            <div class="w-12 h-12 relative">
+                                                <img class="w-12 h-12 rounded-full mx-auto" src="{{ message.user.profile_image.url }}" alt="{{ message.user.username }}">
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>                                                             
+                                <div class="flex-1">
+                                    <div id="typing-indicator" class="text-gray-600" style="position: absolute; display: none; margin-left: 50px;"></div> <!-- Перенесем индикатор сюда и установим его видимость скрытой -->
+                                </div>
+                                    <div class="flex-2 pt-4 pb-10" style="height: 100px; display: flex; justify-content: center; align-items: center;">
+                                        <div class="write bg-white shadow flex rounded-full mt-8"> <!-- Добавим отступ сверху для формы -->
+                                            <div class="flex-1">
+                                                <textarea type="text" name="content" class="w-full block outline-none py-4 px-4 bg-transparent rounded-full" rows="1" placeholder="Введите сообщение..." id="chat-message-input" autofocus="" style="resize: none;"></textarea>
+                                            </div>
+                                            <div class="flex-2 w-16 p-2 flex content-center items-center">
+                                                <div class="flex-1">
+                                                    <form method="post" action=".">
+                                                        <button class="bg-blue-400 w-10 h-10 rounded-full inline-block" id="chat-message-submit">
+                                                            <span class="inline-block align-text-bottom">
+                                                                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-white"><path d="M5 13l4 4L19 7"></path></svg>
+                                                            </span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% block scripts %}
+{{ room.title | json_script:"json-roomtitle" }}
+{{ request.user.username | json_script:"json-username" }}
+<script>
+    const roomTitle = JSON.parse(document.getElementById('json-roomtitle').textContent);
+    const userName = JSON.parse(document.getElementById('json-username').textContent);
+    const usersListElement = document.querySelector('#users-list');
+
+
+    
+    
+    chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + roomTitle
+        + '/'
+    );
+
+    window.addEventListener('beforeunload', function(event) {
+    // Отправка сообщения об отключении пользователя
+        chatSocket.send(JSON.stringify({
+            'command': 'user_left',
+            // Дополнительные данные о пользователе, если необходимо
+        }));
+    });
+    window.addEventListener('unload', function(event) {
+        chatSocket.send(JSON.stringify({
+            'command': 'user_left',
+            // Дополнительные данные о пользователе, если необходимо
+        }));
+    });
+
+
+    function addUserToList(username) {
+        const userList = document.querySelector('#users-list');
+        const li = document.createElement('li');
+        li.textContent = username;
+        // Проверяем, есть ли пользователь уже в списке
+        if (!userList.querySelector(`li[data-username="${username}"]`)) {
+            li.setAttribute('data-username', username); // Добавляем атрибут для идентификации пользователя
+            userList.appendChild(li);
+        }
+    }
+    function removeUserFromList(username) {
+        const li = usersListElement.querySelector(`li[data-username="${username}"]`);
+        if (li) {
+            usersListElement.removeChild(li);
+        }
+    }
+    function updateUsersList(users) {
+        usersListElement.innerHTML = ''; // Очищаем текущий список пользователей
+        users.forEach(user => {
+            addUserToList(user);
+        });
+    }
+            
+
+    chatSocket.onmessage = function(e) {
+    console.log('onMessage', e.data);
+    const data = JSON.parse(e.data);
+    if (data.type === 'active_users') {
+        addUserToList(data.username);
+    } 
+    if (data.type === 'user_left') {
+        removeUserFromList(data.username);
+    } else if (data.type === 'active_users') {
+        const activeUsers = data.users;
+        updateUsersList(activeUsers);
+    }
+    
+
+    if (data.type === 'typing_status') {
+        if (data.message && data.username !== userName) {
+            activeUsers[data.username] = true;
+            typingIndicator.style.display = 'inline';
+            clearTimeout(typingTimer); 
+            typingTimer = setTimeout(function() {
+                typingIndicator.style.display = 'none'; 
+            }, 2000); // 2000 мс (2 секунды)
+            updateTypingIndicator();
+            
+        } else if (!data.message && data.username !== userName) {
+            typingIndicator.style.display = 'none';
+            delete activeUsers[data.username];
+        }
+    }    
+    else if (data.message) {
+            const timestamp = new Date(data.timestamp); 
+            const formattedTime = timestamp.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); 
+            let html = '<div class="message mb-4 flex';
+                html += data.username == "{{ request.user }}" ? ' justify-end' : ' justify-start';
+                html += '">';
+                if (data.username != "{{ request.user }}") {
+                    html += '<div class="flex-2">';
+                    html += '<div class="w-12 h-12 relative">';
+                    html += '<img class="w-12 h-12 rounded-full mx-auto" src="' + data.profile_image_url + '" alt="' + data.username + '">';
+                    html += '</div>';
+                    html += '</div>';
+                }
+                html += '<div class="flex-1 px-2';
+                html += data.username == "{{ request.user }}" ? ' text-right' : '';
+                html += '">';
+                html += '<p class="text-sm font-semibold';
+                html += data.username == "{{ request.user }}" ? ' text-black' : ' text-gray-900 dark:text-black';
+                html += '">';
+                html += data.username;
+                html += '</p>';
+                html += '<div class="inline-block';
+                html += data.username == "{{ request.user }}" ? ' bg-blue-500 text-white' : ' bg-gray-300 text-gray-700';
+                html += ' rounded-full p-2 px-6">';
+                html += '<span>';
+                html += data.message;
+                html += '</span>';
+                html += '</div>';
+                html += '<div class="pl-4"><small class="text-gray-500">';
+                html += formattedTime;
+                html += '</small></div>';
+                html += '</div>';
+                if (data.username == "{{ request.user }}") {
+                    html += '<div class="flex-2">';
+                    html += '<div class="w-12 h-12 relative">';
+                    html += '<img class="w-12 h-12 rounded-full mx-auto" src="' + data.profile_image_url + '" alt="' + data.username + '">';
+                    html += '</div>';
+                    html += '</div>';
+                }
+                html += '</div>';
+            document.querySelector('#chat-messages').innerHTML += html;
+            scrollToBottom();
+            typingIndicator.textContent = '';
+        }
+    };
+
+    chatSocket.onopen = function(e){
+        console.log('OnOpen - chat socket was opened')
+
+    };
+
+    chatSocket.onclose = function(e){
+        console.log('OnClose - chat socket was closed')
+    };
+
+    function sendMessage() {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value.trim(); 
+        if (message) {
+            chatSocket.send(JSON.stringify({
+                'type': 'message',
+                'message': message,
+                'username': userName,
+                'profile_image_url': "{{ request.user.profile_image.url }}",
+                'room': roomTitle,
+            }));
+            messageInputDom.value = '';
+            clearTimeout(typingTimer);
+        } else {
+            alert('Сообщение не может быть пустым');
+        }}
+    document.querySelector('#chat-message-submit').addEventListener('click', function(e) {
+        e.preventDefault();
+        sendMessage();
+        clearTimeout(typingTimer);
+        });
+    document.querySelector('#chat-message-input').addEventListener('keypress', function(e) {
+        if (e.keyCode === 13 && !e.shiftKey) { 
+            e.preventDefault(); 
+            sendMessage();
+            clearTimeout(typingTimer);
+        }});
+
+    // // Индикатор печати сообщения
+    let activeUsers = {};
+    function updateTypingIndicator() {
+        const activeUserCount = Object.keys(activeUsers).length;
+        const typingIndicator = document.querySelector('#typing-indicator');
+        
+        if (activeUserCount === 0) {
+            typingIndicator.textContent = ''; // Очищаем индикатор, если нет активных пользователей
+        } else if (activeUserCount === 1) {
+            const username = Object.keys(activeUsers)[0];
+            typingIndicator.textContent = `${username} печатает...`; // Отображаем уведомление о наборе текста для одного пользователя
+        } else {
+            const usernames = Object.keys(activeUsers).join(', '); // Получаем список имен активных пользователей
+            typingIndicator.textContent = `${usernames} печатают...`; // Отображаем уведомление о наборе текста для нескольких пользователей
+        }
+    }
+    const messageInputDom = document.querySelector('#chat-message-input');
+    const typingIndicator = document.querySelector('#typing-indicator');
+    let typingTimer;
+    let isTyping;
+    messageInputDom.addEventListener('input', function() {
+        clearTimeout(typingTimer);
+
+        if (messageInputDom.value.trim() !== '') {
+            isTyping = true;
+            typingIndicator.style.display = 'inline';
+            chatSocket.send(JSON.stringify({
+                'type': 'writing_active',
+                'username': userName,
+                'message': messageInputDom.value.trim(),
+                'room': roomTitle,
+            }));
+        } else {
+            isTyping = false;
+            typingIndicator.style.display = 'none'; // Если сообщение пустое, скрываем индикатор
+            clearTimeout(typingTimer); // Очищаем таймер, чтобы он не отправил пустое сообщение
+            return; // Выходим из функции, чтобы не отправлять пустое сообщение
+        }
+
+        typingTimer = setTimeout(function() {
+            isTyping = false;
+            chatSocket.send(JSON.stringify({
+                'type': 'writing_inactive',
+                'username': userName,
+                'message': messageInputDom.value.trim(),
+                'room': roomTitle,
+            }));
+        }, 2000); // 2000 мс (2 секунды)
+    });
+
+    // Скролить вниз
+    function scrollToBottom() {
+        const objDiv = document.querySelector('.chat-messages');
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+    scrollToBottom();
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleUsersList = document.getElementById('toggle-users-list');
+        const usersList = document.getElementById('users-list');
+        const toggleIcon = document.getElementById('toggle-icon');
+
+        toggleUsersList.addEventListener('click', function() {
+            if (usersList.style.display === 'none') {
+                usersList.style.display = 'block';
+                usersList.style.maxHeight = usersList.scrollHeight + 'px';
+                toggleIcon.classList.add('rotate-180');
+            } else {
+                usersList.style.maxHeight = '0';
+                toggleIcon.classList.remove('rotate-180');
+                setTimeout(function() {
+                    usersList.style.display = 'none';
+                }, 300);
+            }
+        });
+    });
+
+    document.getElementById('profileImageInput').addEventListener('change', function() {
+        var formData = new FormData();
+        formData.append('profile_image', this.files[0]);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "upload_profile_image" %}', true);
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    var profileImage = document.getElementById('profileImage');
+                    profileImage.src = response.profile_image_url;
+                } else {
+                    console.error('Ошибка при загрузке изображения профиля');
+                }
+            }
+        };
+
+        xhr.send(formData);
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+    const toggleIcon = document.getElementById("sidebarToggleIcon");
+    const sidebar = document.querySelector(".sidebar");
+
+    // Обработчик события для иконки
+    toggleIcon.addEventListener("click", function() {
+        // Переключаем классы боковой панели
+        sidebar.classList.toggle("hidden");
+    });
+});
+</script>
+{% endblock %}
+

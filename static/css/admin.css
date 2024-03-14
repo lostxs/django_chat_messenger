@@ -1,0 +1,16 @@
+#header {
+    background-color: slate-700;
+    font-size: 20px;
+}
+
+#content {
+    background-color: brown;
+}
+
+#content h1 {
+    font-size: 36px;
+}
+
+#main {
+    background-color: aqua;
+}

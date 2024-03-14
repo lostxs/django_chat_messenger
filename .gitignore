@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+package.json
+index.js
+venv/
+core/migrations/
+room/migrations/
+media_cdn/profile_images/1
+media_cdn/profile_images/2
+media_cdn/profile_images/3
+media_cdn/profile_images/9
+requirements.txt
